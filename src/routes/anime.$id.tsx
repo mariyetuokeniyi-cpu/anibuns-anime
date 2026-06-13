@@ -14,13 +14,15 @@ const detailOpts = (id: number) =>
   });
 
 export const Route = createFileRoute("/anime/$id")({
-  head: ({ loaderData }: { loaderData: Awaited<ReturnType<typeof getAnimeDetail>> | undefined }) => ({
+  head: (ctx) => {
+    const loaderData = ctx.loaderData as Awaited<ReturnType<typeof getAnimeDetail>> | undefined;
+    return ({
     meta: [
       { title: loaderData?.title ? `${loaderData.title} — AniBloom` : "Anime — AniBloom" },
       { name: "description", content: loaderData?.synopsis?.slice(0, 155) ?? "Anime details." },
       ...(loaderData?.image_url ? [{ property: "og:image", content: loaderData.image_url }] : []),
     ],
-  }),
+  })},
   loader: async ({ params, context }) => {
     const id = Number(params.id);
     if (!Number.isFinite(id)) throw notFound();
