@@ -26,6 +26,7 @@ export function Header() {
         <nav className="flex items-center gap-1 sm:gap-3 text-sm font-medium">
           <NavLink to="/" exact>Home</NavLink>
           <NavLink to="/browse">Browse</NavLink>
+          <NavLink to="/schedule">Schedule</NavLink>
           {user ? (
             <>
               <NavLink to="/watchlist">

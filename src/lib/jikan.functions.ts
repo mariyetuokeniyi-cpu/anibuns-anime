@@ -109,3 +109,22 @@ export const getAnimeDetail = createServerFn({ method: "GET" })
       return null;
     }
   });
+
+export type ScheduleEntry = AnimeSummary & {
+  broadcast_time: string | null;
+  broadcast_timezone: string | null;
+};
+
+const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
+export type ScheduleDay = (typeof DAYS)[number];
+
+export const getSchedule = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ day: z.enum(DAYS) }))
+  .handler(async ({ data }): Promise<ScheduleEntry[]> => {
+    const res = await jikan(`/schedules?filter=${data.day}&sfw=true&limit=25`);
+    return (res.data as any[]).map((a) => ({
+      ...toSummary(a),
+      broadcast_time: a.broadcast?.time ?? null,
+      broadcast_timezone: a.broadcast?.timezone ?? null,
+    }));
+  });
