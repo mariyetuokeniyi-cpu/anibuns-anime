@@ -8,7 +8,7 @@ import { Blossom } from "@/components/decorations";
 export const Route = createFileRoute("/browse")({
   head: () => ({
     meta: [
-      { title: "Browse anime — AniBloom" },
+      { title: "Browse anime — Anibuns" },
       { name: "description", content: "Search and filter anime by genre and type." },
     ],
   }),

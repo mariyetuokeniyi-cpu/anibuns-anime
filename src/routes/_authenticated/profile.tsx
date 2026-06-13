@@ -8,7 +8,7 @@ import { Blossom } from "@/components/decorations";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "Profile — AniBloom" }] }),
+  head: () => ({ meta: [{ title: "Profile — Anibuns" }] }),
   component: ProfilePage,
 });
 

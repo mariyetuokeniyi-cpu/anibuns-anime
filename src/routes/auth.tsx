@@ -12,7 +12,7 @@ export const Route = createFileRoute("/auth")({
   validateSearch: search,
   head: () => ({
     meta: [
-      { title: "Sign in — AniBloom" },
+      { title: "Sign in — Anibuns" },
       { name: "description", content: "Sign in or create an account to save your anime watchlist." },
     ],
   }),
@@ -47,7 +47,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Welcome to AniBloom 🌸");
+        toast.success("Welcome to Anibuns 🌸");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -83,7 +83,7 @@ function AuthPage() {
         <Sparkle size={20} />
       </div>
       <h1 className="font-display text-3xl font-bold">
-        {mode === "signin" ? "Welcome back" : "Join AniBloom"}
+        {mode === "signin" ? "Welcome back" : "Join Anibuns"}
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {mode === "signin" ? "Sign in to your fluffy cloud" : "Create your account in seconds"}
