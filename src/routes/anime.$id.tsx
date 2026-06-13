@@ -14,7 +14,7 @@ const detailOpts = (id: number) =>
   });
 
 export const Route = createFileRoute("/anime/$id")({
-  head: ({ loaderData }) => ({
+  head: ({ loaderData }: { loaderData: Awaited<ReturnType<typeof getAnimeDetail>> | undefined }) => ({
     meta: [
       { title: loaderData?.title ? `${loaderData.title} — AniBloom` : "Anime — AniBloom" },
       { name: "description", content: loaderData?.synopsis?.slice(0, 155) ?? "Anime details." },
