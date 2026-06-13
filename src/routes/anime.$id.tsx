@@ -14,6 +14,7 @@ import {
 } from "@/lib/user.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { Blossom, Cloud, Heart, Sparkle } from "@/components/decorations";
+import { CloudPlayer } from "@/components/CloudPlayer";
 import { toast } from "sonner";
 
 
@@ -215,8 +216,14 @@ function DetailPage() {
           </p>
 
           {playing && (
-            <div className="mb-4 overflow-hidden rounded-3xl border bg-black shadow-lg aspect-video">
-              <video src={playing} controls autoPlay className="h-full w-full" />
+            <div className="mb-4">
+              <CloudPlayer
+                src={playing}
+                title={anime.title}
+                playlist={streams.map((s) => ({ id: s.id, label: s.label, url: s.url }))}
+                activeId={streams.find((s) => s.url === playing)?.id}
+                onSelect={(p) => setPlaying(p.url)}
+              />
             </div>
           )}
 
