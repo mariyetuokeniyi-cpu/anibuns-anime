@@ -38,6 +38,36 @@ export type Database = {
         }
         Relationships: []
       }
+      stream_links: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          mal_id: number
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string
+          mal_id: number
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          mal_id?: number
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       watch_history: {
         Row: {
           id: string

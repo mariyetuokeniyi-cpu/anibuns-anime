@@ -120,3 +120,51 @@ export const isInWatchlist = createServerFn({ method: "GET" })
       .maybeSingle();
     return { inList: !!row };
   });
+
+export const getStreamLinks = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ mal_id: z.number().int().positive() }))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("stream_links")
+      .select("*")
+      .eq("user_id", context.userId)
+      .eq("mal_id", data.mal_id)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const addStreamLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      mal_id: z.number().int().positive(),
+      label: z.string().min(1).max(60).default("Kamatera Cloud"),
+      url: z.string().url(),
+    }),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("stream_links").insert({
+      user_id: context.userId,
+      mal_id: data.mal_id,
+      label: data.label,
+      url: data.url,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const removeStreamLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ id: z.string().uuid() }))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("stream_links")
+      .delete()
+      .eq("user_id", context.userId)
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
