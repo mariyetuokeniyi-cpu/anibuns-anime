@@ -92,7 +92,47 @@ function DetailPage() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  // Kamatera Cloud streams
+  const getStreamsFn = useServerFn(getStreamLinks);
+  const addStreamFn = useServerFn(addStreamLink);
+  const removeStreamFn = useServerFn(removeStreamLink);
+
+  const { data: streams = [] } = useQuery({
+    queryKey: ["stream-links", id],
+    queryFn: () => getStreamsFn({ data: { mal_id: id } }),
+    enabled: !!user,
+  });
+
+  const [playing, setPlaying] = useState<string | null>(null);
+  const [newLabel, setNewLabel] = useState("Kamatera Cloud");
+  const [newUrl, setNewUrl] = useState("");
+
+  const addStream = useMutation({
+    mutationFn: async () => {
+      if (!anime) return;
+      await addStreamFn({ data: { mal_id: anime.mal_id, label: newLabel.trim() || "Kamatera Cloud", url: newUrl.trim() } });
+    },
+    onSuccess: () => {
+      setNewUrl("");
+      qc.invalidateQueries({ queryKey: ["stream-links", id] });
+      toast.success("Stream link saved ☁️");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const removeStream = useMutation({
+    mutationFn: async (linkId: string) => {
+      await removeStreamFn({ data: { id: linkId } });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["stream-links", id] });
+      toast.success("Removed");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   if (!anime) return null;
+
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
