@@ -205,7 +205,88 @@ function DetailPage() {
         </div>
       </div>
 
+      {user && (
+        <section className="mt-12">
+          <h2 className="mb-2 flex items-center gap-2 font-display text-2xl font-bold">
+            <Cloud size={36} /> Kamatera Cloud Streams
+          </h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Save your own Kamatera-hosted video URLs and play them right here ☁️💖
+          </p>
+
+          {playing && (
+            <div className="mb-4 overflow-hidden rounded-3xl border bg-black shadow-lg aspect-video">
+              <video src={playing} controls autoPlay className="h-full w-full" />
+            </div>
+          )}
+
+          <ul className="mb-4 space-y-2">
+            {streams.map((s) => (
+              <li
+                key={s.id}
+                className="flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-sm"
+              >
+                <Cloud size={24} />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-semibold text-foreground">{s.label}</div>
+                  <div className="truncate text-xs text-muted-foreground">{s.url}</div>
+                </div>
+                <button
+                  onClick={() => setPlaying(s.url)}
+                  className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow hover:scale-105 transition"
+                >
+                  ▶ Play
+                </button>
+                <button
+                  onClick={() => removeStream.mutate(s.id)}
+                  className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground/70 hover:bg-destructive hover:text-destructive-foreground transition"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+            {streams.length === 0 && (
+              <li className="rounded-2xl border border-dashed border-border bg-card/50 p-4 text-center text-sm text-muted-foreground">
+                No streams yet — add a Kamatera URL below 🌸
+              </li>
+            )}
+          </ul>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!newUrl.trim()) return;
+              addStream.mutate();
+            }}
+            className="flex flex-col gap-2 rounded-3xl border border-border bg-card p-4 shadow-sm sm:flex-row"
+          >
+            <input
+              value={newLabel}
+              onChange={(e) => setNewLabel(e.target.value)}
+              placeholder="Label"
+              className="rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring sm:w-40"
+            />
+            <input
+              value={newUrl}
+              onChange={(e) => setNewUrl(e.target.value)}
+              placeholder="https://your-kamatera-server.com/episode.mp4"
+              type="url"
+              required
+              className="flex-1 rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            />
+            <button
+              type="submit"
+              disabled={addStream.isPending}
+              className="rounded-2xl bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow hover:scale-105 transition disabled:opacity-60"
+            >
+              ☁️ Save
+            </button>
+          </form>
+        </section>
+      )}
+
       {anime.trailer_youtube_id && (
+
         <section className="mt-12">
           <h2 className="mb-4 flex items-center gap-2 font-display text-2xl font-bold">
             <Blossom size={28} /> Trailer
