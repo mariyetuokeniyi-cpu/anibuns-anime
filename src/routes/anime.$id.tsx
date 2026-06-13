@@ -18,7 +18,7 @@ export const Route = createFileRoute("/anime/$id")({
     const loaderData = ctx.loaderData as Awaited<ReturnType<typeof getAnimeDetail>> | undefined;
     return ({
     meta: [
-      { title: loaderData?.title ? `${loaderData.title} — AniBloom` : "Anime — AniBloom" },
+      { title: loaderData?.title ? `${loaderData.title} — Anibuns` : "Anime — Anibuns" },
       { name: "description", content: loaderData?.synopsis?.slice(0, 155) ?? "Anime details." },
       ...(loaderData?.image_url ? [{ property: "og:image", content: loaderData.image_url }] : []),
     ],

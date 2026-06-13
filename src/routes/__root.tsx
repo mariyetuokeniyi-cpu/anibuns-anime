@@ -58,9 +58,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AniBloom — cozy anime discovery" },
+      { title: "Anibuns — cozy anime discovery" },
       { name: "description", content: "Discover anime, save your favorites, and watch trailers in a soft, pastel world." },
-      { property: "og:title", content: "AniBloom" },
+      { property: "og:title", content: "Anibuns" },
       { property: "og:description", content: "Discover anime, save your favorites, and watch trailers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

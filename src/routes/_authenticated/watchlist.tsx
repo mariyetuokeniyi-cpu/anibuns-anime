@@ -8,7 +8,7 @@ import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/watchlist")({
-  head: () => ({ meta: [{ title: "My watchlist — AniBloom" }] }),
+  head: () => ({ meta: [{ title: "My watchlist — Anibuns" }] }),
   component: WatchlistPage,
 });
 

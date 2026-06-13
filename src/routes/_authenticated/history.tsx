@@ -6,7 +6,7 @@ import { AnimeCard } from "@/components/AnimeCard";
 import { Sparkle } from "@/components/decorations";
 
 export const Route = createFileRoute("/_authenticated/history")({
-  head: () => ({ meta: [{ title: "Watch history — AniBloom" }] }),
+  head: () => ({ meta: [{ title: "Watch history — Anibuns" }] }),
   component: HistoryPage,
 });
 

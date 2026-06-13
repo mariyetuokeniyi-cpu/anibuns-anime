@@ -21,7 +21,7 @@ export function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link to="/" className="flex items-center gap-2 font-display text-2xl font-bold text-primary">
           <Blossom size={32} />
-          <span>AniBloom</span>
+          <span>Anibuns</span>
         </Link>
         <nav className="flex items-center gap-1 sm:gap-3 text-sm font-medium">
           <NavLink to="/" exact>Home</NavLink>

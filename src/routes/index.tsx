@@ -11,7 +11,7 @@ const seasonOpts = queryOptions({ queryKey: ["season-now"], queryFn: () => getSe
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AniBloom — cozy anime discovery 🌸" },
+      { title: "Anibuns — cozy anime discovery 🌸" },
       { name: "description", content: "Pastel anime discovery. Browse top airing shows, save favorites, watch trailers." },
     ],
   }),
