@@ -54,7 +54,7 @@ function Index() {
       </section>
 
       <Row title="Top of all time" emoji="✨" items={top} />
-      <Row title="Airing this season" emoji="🌷" items={season} />
+      <Row title="Airing this season" emoji="☁️" items={season} />
     </div>
   );
 }
