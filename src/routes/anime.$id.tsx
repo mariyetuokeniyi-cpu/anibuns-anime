@@ -1,11 +1,21 @@
 import { createFileRoute, notFound, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import { getAnimeDetail } from "@/lib/jikan.functions";
-import { addToWatchlist, removeFromWatchlist, isInWatchlist, logWatch } from "@/lib/user.functions";
+import {
+  addToWatchlist,
+  removeFromWatchlist,
+  isInWatchlist,
+  logWatch,
+  getStreamLinks,
+  addStreamLink,
+  removeStreamLink,
+} from "@/lib/user.functions";
 import { useAuth } from "@/hooks/use-auth";
-import { Blossom, Heart, Sparkle } from "@/components/decorations";
+import { Blossom, Cloud, Heart, Sparkle } from "@/components/decorations";
 import { toast } from "sonner";
+
 
 const detailOpts = (id: number) =>
   queryOptions({
