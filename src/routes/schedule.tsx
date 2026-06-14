@@ -95,9 +95,9 @@ function SchedulePage() {
                     )}
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col justify-between py-1">
-                    <h3 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary transition">
+                    <h2 className="line-clamp-2 text-sm font-semibold text-foreground group-hover:text-primary transition">
                       {a.title}
-                    </h3>
+                    </h2>
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       {a.broadcast_time && (
                         <span className="rounded-full bg-primary/10 px-2 py-0.5 font-semibold text-primary">

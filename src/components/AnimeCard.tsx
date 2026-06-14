@@ -28,9 +28,9 @@ export function AnimeCard({ anime }: { anime: AnimeSummary | { mal_id: number; t
           </div>
         ) : null}
       </div>
-      <h3 className="mt-2 line-clamp-2 px-1 text-sm font-semibold text-foreground/90 group-hover:text-primary transition">
+      <h2 className="mt-2 line-clamp-2 px-1 text-sm font-semibold text-foreground/90 group-hover:text-primary transition">
         {anime.title}
-      </h3>
+      </h2>
     </Link>
   );
 }
