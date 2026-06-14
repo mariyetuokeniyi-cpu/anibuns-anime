@@ -57,6 +57,7 @@ function BrowsePage() {
           value={q}
           onChange={(e) => { setQ(e.target.value); setPage(1); }}
           placeholder="Search by title... ✨"
+          aria-label="Search anime by title"
           className="w-full rounded-full border border-border bg-background px-5 py-3 outline-none ring-primary focus:ring-2 transition"
         />
         <div className="mt-3 flex flex-wrap gap-2">
