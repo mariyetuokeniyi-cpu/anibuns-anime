@@ -57,6 +57,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
+      { name: "google-site-verification", content: "ZPbsp28jFoWzy4vH4h4__krxGk_cCW0zjI-49KwouiM" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Anibuns — cozy anime discovery" },
       { name: "description", content: "Discover anime, save your favorites, and watch trailers in a soft, pastel world." },

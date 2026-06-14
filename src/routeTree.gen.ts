@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -19,6 +20,11 @@ import { Route as AuthenticatedWatchlistRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScheduleRoute = ScheduleRouteImport.update({
   id: '/schedule',
   path: '/schedule',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/schedule': typeof ScheduleRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/watchlist': typeof AuthenticatedWatchlistRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/schedule': typeof ScheduleRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/watchlist': typeof AuthenticatedWatchlistRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/schedule': typeof ScheduleRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/watchlist': typeof AuthenticatedWatchlistRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/schedule'
+    | '/sitemap.xml'
     | '/history'
     | '/profile'
     | '/watchlist'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/schedule'
+    | '/sitemap.xml'
     | '/history'
     | '/profile'
     | '/watchlist'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/schedule'
+    | '/sitemap.xml'
     | '/_authenticated/history'
     | '/_authenticated/profile'
     | '/_authenticated/watchlist'
@@ -136,11 +148,19 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BrowseRoute: typeof BrowseRoute
   ScheduleRoute: typeof ScheduleRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AnimeIdRoute: typeof AnimeIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/schedule': {
       id: '/schedule'
       path: '/schedule'
@@ -228,6 +248,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BrowseRoute: BrowseRoute,
   ScheduleRoute: ScheduleRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AnimeIdRoute: AnimeIdRoute,
 }
 export const routeTree = rootRouteImport
