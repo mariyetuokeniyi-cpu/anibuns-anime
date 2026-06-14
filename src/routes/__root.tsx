@@ -67,8 +67,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Anibuns — cozy anime discovery" },
       { name: "twitter:description", content: "Discover anime, save your favorites, and watch trailers in a soft, pastel world." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1c407c40-e28d-4eda-ba4f-225e45edf07d" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1c407c40-e28d-4eda-ba4f-225e45edf07d" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/2cc7d8fd-a2ae-495d-9b14-f8ae45b9e748" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/2cc7d8fd-a2ae-495d-9b14-f8ae45b9e748" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
