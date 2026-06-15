@@ -100,6 +100,47 @@ function DetailPage() {
   const addStreamFn = useServerFn(addStreamLink);
   const removeStreamFn = useServerFn(removeStreamLink);
 
+  // Characters + favorites
+  const getCharactersFn = useServerFn(getAnimeCharacters);
+  const getFavsFn = useServerFn(getMyFavoriteCharacters);
+  const addFavFn = useServerFn(addFavoriteCharacter);
+  const removeFavFn = useServerFn(removeFavoriteCharacter);
+
+  const { data: characters = [] } = useQuery({
+    queryKey: ["anime-characters", id],
+    queryFn: () => getCharactersFn({ data: { id } }),
+  });
+  const { data: myFavs = [] } = useQuery({
+    queryKey: ["favorite-characters"],
+    queryFn: () => getFavsFn(),
+    enabled: !!user,
+  });
+  const favIds = new Set(myFavs.map((f) => f.mal_character_id));
+
+  const toggleFav = useMutation({
+    mutationFn: async (c: { mal_id: number; name: string; image_url: string | null }) => {
+      if (!anime) return;
+      if (favIds.has(c.mal_id)) {
+        await removeFavFn({ data: { mal_character_id: c.mal_id } });
+      } else {
+        await addFavFn({
+          data: {
+            mal_character_id: c.mal_id,
+            character_name: c.name,
+            character_image_url: c.image_url,
+            anime_mal_id: anime.mal_id,
+            anime_title: anime.title,
+          },
+        });
+      }
+    },
+    onSuccess: (_d, c) => {
+      qc.invalidateQueries({ queryKey: ["favorite-characters"] });
+      toast.success(favIds.has(c.mal_id) ? "Removed from favorites" : "Saved to favorites 💖");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const { data: streams = [] } = useQuery({
     queryKey: ["stream-links", id],
     queryFn: () => getStreamsFn({ data: { mal_id: id } }),
