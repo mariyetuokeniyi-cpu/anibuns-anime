@@ -2,7 +2,7 @@ import { createFileRoute, notFound, Link, useRouter } from "@tanstack/react-rout
 import { useSuspenseQuery, queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { getAnimeDetail } from "@/lib/jikan.functions";
+import { getAnimeDetail, getAnimeCharacters } from "@/lib/jikan.functions";
 import {
   addToWatchlist,
   removeFromWatchlist,
@@ -11,6 +11,9 @@ import {
   getStreamLinks,
   addStreamLink,
   removeStreamLink,
+  getMyFavoriteCharacters,
+  addFavoriteCharacter,
+  removeFavoriteCharacter,
 } from "@/lib/user.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { Blossom, Cloud, Heart, Sparkle } from "@/components/decorations";
