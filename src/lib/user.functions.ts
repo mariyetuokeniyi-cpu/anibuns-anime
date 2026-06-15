@@ -222,3 +222,54 @@ export const removeStreamLink = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+
+const characterInput = z.object({
+  mal_character_id: z.number().int().positive(),
+  character_name: z.string().min(1).max(120),
+  character_image_url: z.string().url().nullable().optional(),
+  anime_mal_id: z.number().int().positive().nullable().optional(),
+  anime_title: z.string().max(200).nullable().optional(),
+});
+
+export const getMyFavoriteCharacters = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("favorite_characters")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const addFavoriteCharacter = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(characterInput)
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("favorite_characters").upsert(
+      {
+        user_id: context.userId,
+        mal_character_id: data.mal_character_id,
+        character_name: data.character_name,
+        character_image_url: data.character_image_url ?? null,
+        anime_mal_id: data.anime_mal_id ?? null,
+        anime_title: data.anime_title ?? null,
+      },
+      { onConflict: "user_id,mal_character_id" },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const removeFavoriteCharacter = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ mal_character_id: z.number().int().positive() }))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("favorite_characters")
+      .delete()
+      .eq("user_id", context.userId)
+      .eq("mal_character_id", data.mal_character_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
