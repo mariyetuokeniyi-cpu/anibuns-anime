@@ -11,7 +11,7 @@ const profileOpts = (username: string) =>
 
 export const Route = createFileRoute("/u/$username")({
   head: (ctx) => {
-    const p = ctx.loaderData as Awaited<ReturnType<typeof getPublicProfileByUsername>>;
+    const p = ctx.loaderData as Awaited<ReturnType<typeof getPublicProfileByUsername>> | undefined;
     const name = p?.display_name || p?.username || "Profile";
     const desc = p?.bio || `${name}'s anime profile on Anibuns 🌸`;
     return {
