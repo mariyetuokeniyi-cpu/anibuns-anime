@@ -249,6 +249,45 @@ function DetailPage() {
         </div>
       </div>
 
+      {characters.length > 0 && (
+        <section className="mt-12">
+          <h2 className="mb-4 flex items-center gap-2 font-display text-2xl font-bold">
+            <Heart size={24} /> Characters
+          </h2>
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
+            {characters.map((c) => {
+              const faved = favIds.has(c.mal_id);
+              return (
+                <div key={c.mal_id} className="group relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="aspect-[2/3] bg-muted">
+                    {c.image_url ? (
+                      <img src={c.image_url} alt={c.name} loading="lazy" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-2xl">🌸</div>
+                    )}
+                  </div>
+                  <div className="p-2">
+                    <div className="line-clamp-1 text-xs font-semibold">{c.name}</div>
+                    {c.role && <div className="text-[10px] text-muted-foreground">{c.role}</div>}
+                  </div>
+                  {user ? (
+                    <button
+                      onClick={() => toggleFav.mutate({ mal_id: c.mal_id, name: c.name, image_url: c.image_url })}
+                      aria-label={faved ? "Remove from favorites" : "Add to favorites"}
+                      className={`absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full shadow transition ${
+                        faved ? "bg-primary text-primary-foreground" : "bg-background/90 text-foreground/70 hover:bg-primary hover:text-primary-foreground"
+                      }`}
+                    >
+                      <Heart size={14} />
+                    </button>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {user && (
         <section className="mt-12">
           <h2 className="mb-2 flex items-center gap-2 font-display text-2xl font-bold">
