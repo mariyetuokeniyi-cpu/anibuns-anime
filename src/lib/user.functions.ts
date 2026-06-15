@@ -93,19 +93,67 @@ export const updateProfile = createServerFn({ method: "POST" })
     z.object({
       display_name: z.string().min(1).max(60),
       avatar_url: z.string().url().or(z.literal("")).optional(),
+      bio: z.string().max(280).optional(),
+      username: z.string().min(2).max(40).optional(),
     }),
   )
   .handler(async ({ data, context }) => {
+    let username: string | undefined;
+    if (data.username !== undefined) {
+      username = data.username
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-+|-+$)/g, "");
+      if (username.length < 2) throw new Error("Username must be at least 2 characters");
+
+      const { data: existing } = await context.supabase
+        .from("profiles")
+        .select("id")
+        .eq("username", username)
+        .neq("id", context.userId)
+        .maybeSingle();
+      if (existing) throw new Error("That username is taken 🌸");
+    }
+
+    const payload: Record<string, unknown> = {
+      display_name: data.display_name,
+      updated_at: new Date().toISOString(),
+    };
+    if (data.avatar_url !== undefined) payload.avatar_url = data.avatar_url || null;
+    if (data.bio !== undefined) payload.bio = data.bio || null;
+    if (username !== undefined) payload.username = username;
+
     const { error } = await context.supabase
       .from("profiles")
-      .update({
-        display_name: data.display_name,
-        avatar_url: data.avatar_url || null,
-        updated_at: new Date().toISOString(),
-      })
+      .update(payload)
       .eq("id", context.userId);
     if (error) throw new Error(error.message);
-    return { ok: true };
+    return { ok: true, username };
+  });
+
+export const uploadAvatar = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      file_base64: z.string().min(10),
+      content_type: z.string().regex(/^image\/(png|jpeg|jpg|webp|gif)$/),
+    }),
+  )
+  .handler(async ({ data, context }) => {
+    const buf = Buffer.from(data.file_base64, "base64");
+    if (buf.byteLength > 3 * 1024 * 1024) throw new Error("Image must be under 3 MB");
+    const path = `${context.userId}/avatar`;
+    const { error: upErr } = await context.supabase.storage
+      .from("avatars")
+      .upload(path, buf, { contentType: data.content_type, upsert: true });
+    if (upErr) throw new Error(upErr.message);
+    const url = `/api/public/avatar/${context.userId}?v=${Date.now()}`;
+    const { error } = await context.supabase
+      .from("profiles")
+      .update({ avatar_url: url, updated_at: new Date().toISOString() })
+      .eq("id", context.userId);
+    if (error) throw new Error(error.message);
+    return { url };
   });
 
 export const isInWatchlist = createServerFn({ method: "GET" })
