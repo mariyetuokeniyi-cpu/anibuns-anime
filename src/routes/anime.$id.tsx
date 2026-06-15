@@ -2,7 +2,7 @@ import { createFileRoute, notFound, Link, useRouter } from "@tanstack/react-rout
 import { useSuspenseQuery, queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { getAnimeDetail } from "@/lib/jikan.functions";
+import { getAnimeDetail, getAnimeCharacters } from "@/lib/jikan.functions";
 import {
   addToWatchlist,
   removeFromWatchlist,
@@ -11,6 +11,9 @@ import {
   getStreamLinks,
   addStreamLink,
   removeStreamLink,
+  getMyFavoriteCharacters,
+  addFavoriteCharacter,
+  removeFavoriteCharacter,
 } from "@/lib/user.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { Blossom, Cloud, Heart, Sparkle } from "@/components/decorations";
@@ -96,6 +99,47 @@ function DetailPage() {
   const getStreamsFn = useServerFn(getStreamLinks);
   const addStreamFn = useServerFn(addStreamLink);
   const removeStreamFn = useServerFn(removeStreamLink);
+
+  // Characters + favorites
+  const getCharactersFn = useServerFn(getAnimeCharacters);
+  const getFavsFn = useServerFn(getMyFavoriteCharacters);
+  const addFavFn = useServerFn(addFavoriteCharacter);
+  const removeFavFn = useServerFn(removeFavoriteCharacter);
+
+  const { data: characters = [] } = useQuery({
+    queryKey: ["anime-characters", id],
+    queryFn: () => getCharactersFn({ data: { id } }),
+  });
+  const { data: myFavs = [] } = useQuery({
+    queryKey: ["favorite-characters"],
+    queryFn: () => getFavsFn(),
+    enabled: !!user,
+  });
+  const favIds = new Set(myFavs.map((f) => f.mal_character_id));
+
+  const toggleFav = useMutation({
+    mutationFn: async (c: { mal_id: number; name: string; image_url: string | null }) => {
+      if (!anime) return;
+      if (favIds.has(c.mal_id)) {
+        await removeFavFn({ data: { mal_character_id: c.mal_id } });
+      } else {
+        await addFavFn({
+          data: {
+            mal_character_id: c.mal_id,
+            character_name: c.name,
+            character_image_url: c.image_url,
+            anime_mal_id: anime.mal_id,
+            anime_title: anime.title,
+          },
+        });
+      }
+    },
+    onSuccess: (_d, c) => {
+      qc.invalidateQueries({ queryKey: ["favorite-characters"] });
+      toast.success(favIds.has(c.mal_id) ? "Removed from favorites" : "Saved to favorites 💖");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
 
   const { data: streams = [] } = useQuery({
     queryKey: ["stream-links", id],
@@ -204,6 +248,45 @@ function DetailPage() {
           )}
         </div>
       </div>
+
+      {characters.length > 0 && (
+        <section className="mt-12">
+          <h2 className="mb-4 flex items-center gap-2 font-display text-2xl font-bold">
+            <Heart size={24} /> Characters
+          </h2>
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
+            {characters.map((c) => {
+              const faved = favIds.has(c.mal_id);
+              return (
+                <div key={c.mal_id} className="group relative overflow-hidden rounded-2xl border bg-card shadow-sm">
+                  <div className="aspect-[2/3] bg-muted">
+                    {c.image_url ? (
+                      <img src={c.image_url} alt={c.name} loading="lazy" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-2xl">🌸</div>
+                    )}
+                  </div>
+                  <div className="p-2">
+                    <div className="line-clamp-1 text-xs font-semibold">{c.name}</div>
+                    {c.role && <div className="text-[10px] text-muted-foreground">{c.role}</div>}
+                  </div>
+                  {user ? (
+                    <button
+                      onClick={() => toggleFav.mutate({ mal_id: c.mal_id, name: c.name, image_url: c.image_url })}
+                      aria-label={faved ? "Remove from favorites" : "Add to favorites"}
+                      className={`absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full shadow transition ${
+                        faved ? "bg-primary text-primary-foreground" : "bg-background/90 text-foreground/70 hover:bg-primary hover:text-primary-foreground"
+                      }`}
+                    >
+                      <Heart size={14} />
+                    </button>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {user && (
         <section className="mt-12">

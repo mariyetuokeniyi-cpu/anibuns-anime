@@ -15,10 +15,12 @@ import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as AnimeIdRouteImport } from './routes/anime.$id'
 import { Route as AuthenticatedWatchlistRouteImport } from './routes/_authenticated/watchlist'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as ApiPublicAvatarUserIdRouteImport } from './routes/api/public/avatar.$userId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -49,6 +51,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UUsernameRoute = UUsernameRouteImport.update({
+  id: '/u/$username',
+  path: '/u/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnimeIdRoute = AnimeIdRouteImport.update({
   id: '/anime/$id',
   path: '/anime/$id',
@@ -69,6 +76,11 @@ const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicAvatarUserIdRoute = ApiPublicAvatarUserIdRouteImport.update({
+  id: '/api/public/avatar/$userId',
+  path: '/api/public/avatar/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,6 +92,8 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/watchlist': typeof AuthenticatedWatchlistRoute
   '/anime/$id': typeof AnimeIdRoute
+  '/u/$username': typeof UUsernameRoute
+  '/api/public/avatar/$userId': typeof ApiPublicAvatarUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,6 +105,8 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/watchlist': typeof AuthenticatedWatchlistRoute
   '/anime/$id': typeof AnimeIdRoute
+  '/u/$username': typeof UUsernameRoute
+  '/api/public/avatar/$userId': typeof ApiPublicAvatarUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,6 +120,8 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/watchlist': typeof AuthenticatedWatchlistRoute
   '/anime/$id': typeof AnimeIdRoute
+  '/u/$username': typeof UUsernameRoute
+  '/api/public/avatar/$userId': typeof ApiPublicAvatarUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,6 +135,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/watchlist'
     | '/anime/$id'
+    | '/u/$username'
+    | '/api/public/avatar/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,6 +148,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/watchlist'
     | '/anime/$id'
+    | '/u/$username'
+    | '/api/public/avatar/$userId'
   id:
     | '__root__'
     | '/'
@@ -140,6 +162,8 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/watchlist'
     | '/anime/$id'
+    | '/u/$username'
+    | '/api/public/avatar/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -150,6 +174,8 @@ export interface RootRouteChildren {
   ScheduleRoute: typeof ScheduleRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AnimeIdRoute: typeof AnimeIdRoute
+  UUsernameRoute: typeof UUsernameRoute
+  ApiPublicAvatarUserIdRoute: typeof ApiPublicAvatarUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -196,6 +222,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/u/$username': {
+      id: '/u/$username'
+      path: '/u/$username'
+      fullPath: '/u/$username'
+      preLoaderRoute: typeof UUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/anime/$id': {
       id: '/anime/$id'
       path: '/anime/$id'
@@ -224,6 +257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHistoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/avatar/$userId': {
+      id: '/api/public/avatar/$userId'
+      path: '/api/public/avatar/$userId'
+      fullPath: '/api/public/avatar/$userId'
+      preLoaderRoute: typeof ApiPublicAvatarUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -250,17 +290,9 @@ const rootRouteChildren: RootRouteChildren = {
   ScheduleRoute: ScheduleRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AnimeIdRoute: AnimeIdRoute,
+  UUsernameRoute: UUsernameRoute,
+  ApiPublicAvatarUserIdRoute: ApiPublicAvatarUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

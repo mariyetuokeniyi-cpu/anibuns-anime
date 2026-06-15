@@ -128,3 +128,29 @@ export const getSchedule = createServerFn({ method: "GET" })
       broadcast_timezone: a.broadcast?.timezone ?? null,
     }));
   });
+
+export type AnimeCharacter = {
+  mal_id: number;
+  name: string;
+  image_url: string | null;
+  role: string | null;
+};
+
+export const getAnimeCharacters = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ id: z.number().int().positive() }))
+  .handler(async ({ data }): Promise<AnimeCharacter[]> => {
+    try {
+      const res = await jikan(`/anime/${data.id}/characters`);
+      return (res.data as any[]).slice(0, 24).map((entry) => ({
+        mal_id: entry.character?.mal_id,
+        name: entry.character?.name ?? "Unknown",
+        image_url:
+          entry.character?.images?.webp?.image_url ||
+          entry.character?.images?.jpg?.image_url ||
+          null,
+        role: entry.role ?? null,
+      }));
+    } catch {
+      return [];
+    }
+  });

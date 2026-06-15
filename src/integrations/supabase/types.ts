@@ -14,27 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      favorite_characters: {
+        Row: {
+          anime_mal_id: number | null
+          anime_title: string | null
+          character_image_url: string | null
+          character_name: string
+          created_at: string
+          id: string
+          mal_character_id: number
+          user_id: string
+        }
+        Insert: {
+          anime_mal_id?: number | null
+          anime_title?: string | null
+          character_image_url?: string | null
+          character_name: string
+          created_at?: string
+          id?: string
+          mal_character_id: number
+          user_id: string
+        }
+        Update: {
+          anime_mal_id?: number | null
+          anime_title?: string | null
+          character_image_url?: string | null
+          character_name?: string
+          created_at?: string
+          id?: string
+          mal_character_id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string
           display_name: string | null
           id: string
           updated_at: string
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           display_name?: string | null
           id: string
           updated_at?: string
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -127,7 +166,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      slugify: { Args: { input: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never

@@ -1,39 +1,53 @@
-## AniBloom — cute anime streaming app
+## Profile customization
 
-A pastel, kawaii-themed anime discovery app with accounts, watchlist, watch history, and YouTube trailer playback. Real anime metadata via the free Jikan (MyAnimeList) API.
+Expand the profile beyond display name + avatar URL: file-based avatar upload, a list of favorite anime characters picked from anime pages, and a public profile page at `/u/:username`.
 
-### Visual design
-- **Palette:** soft cream background, blush pink primary, lavender accent, mint highlights
-- **Motifs:** pink cherry-blossom flowers, lavender hearts, fluffy clouds as decorative SVG/illustration accents (page corners, dividers, empty states)
-- **Typography:** rounded display font for headings (e.g. Quicksand / Fredoka), soft sans for body
-- **Components:** rounded-2xl cards, soft shadows, subtle hover lift, sparkle/heart hover micro-animations
+### What users get
 
-### Pages (TanStack routes)
-- `/` — landing: hero with clouds + flowers, "Top airing" and "Most popular" carousels (public, SSR with Jikan data)
-- `/browse` — searchable, filterable grid (genre, type, status), pagination
-- `/anime/$id` — detail: cover, synopsis, genres, stats, embedded YouTube trailer, "Add to watchlist" + "Mark watched" buttons
-- `/auth` — sign in / sign up (email + password, plus Google)
-- `/_authenticated/watchlist` — saved anime grid
-- `/_authenticated/history` — recently watched
-- `/_authenticated/profile` — display name, avatar, sign out
+- **Avatar upload** — pick an image file on the profile page; it's stored in Cloud storage and shown everywhere their avatar appears.
+- **Favorite characters** — on any anime detail page, browse the cast and tap a heart to add a character (with their portrait + the show title) to a "Favorites" section on the profile.
+- **Public profile at `/u/:username`** — anyone (signed in or not) can view a user's avatar, display name, favorite characters, and public watchlist. The username is auto-generated from the display name (slugified, uniqueness enforced) and shown on the profile page with a copyable share link.
 
-### Backend (Lovable Cloud)
-- Email/password + Google sign-in
-- Tables:
-  - `profiles` (id → auth.users, display_name, avatar_url) with trigger to auto-create on signup
-  - `watchlist` (id, user_id, mal_id, title, image_url, added_at) — unique (user_id, mal_id)
-  - `watch_history` (id, user_id, mal_id, title, image_url, watched_at)
-- RLS: each user reads/writes only their own rows
-- All Jikan fetches happen in `createServerFn` (cached via TanStack Query); user mutations via authenticated server functions
+### Page changes
 
-### Technical notes
-- Jikan v4 base: `https://api.jikan.moe/v4` — no API key. Endpoints used: `/top/anime`, `/seasons/now`, `/anime?q=&page=`, `/anime/{id}/full`.
-- YouTube trailer comes from Jikan's `trailer.youtube_id` → embed via standard iframe
-- Public route loaders prefetch via TanStack Query `ensureQueryData`
-- Watchlist/history reads use `requireSupabaseAuth` middleware
-- Cute SVG decorations stored in `src/assets/` (generated)
+- **`/_authenticated/profile`** — adds: avatar file picker (replaces / coexists with URL field), username display + "Copy public link" button, "Your favorite characters" grid with remove buttons.
+- **`/anime/$id`** — when signed in, each cast card gets a heart toggle to add/remove that character as a favorite.
+- **`/u/$username`** (new public route) — header with avatar, name, share button; sections for favorite characters and recent watchlist. Sets `head()` meta + og:image to the user's avatar for shareable links. Shows a friendly "not found" if the username doesn't exist.
+
+### Technical details
+
+**Storage**
+- New private bucket `avatars`. Files stored at `{user_id}/avatar.{ext}`. RLS: owners read/write their own folder; reads exposed via signed URLs returned from the profile server fn (so we don't need a public bucket).
+
+**Database migration**
+- `profiles`: add `username text unique`, `bio text` (already covered by avatar — skip if not wanted), backfill `username` from existing `display_name` via slugify in SQL, add unique index. Allow public SELECT of `username, display_name, avatar_url, id` only (separate policy).
+- New table `favorite_characters` (`user_id`, `mal_character_id`, `character_name`, `character_image_url`, `anime_mal_id`, `anime_title`, `created_at`, unique on `(user_id, mal_character_id)`). RLS: owner manages; public SELECT allowed (for the public profile page).
+- GRANTs: `authenticated` full, `anon` SELECT on profiles (limited columns via policy) and `favorite_characters`, plus `watchlist` public-read policy scoped to rows whose owner has a username.
+
+**Server functions** (`src/lib/user.functions.ts`)
+- `uploadAvatar({ fileBase64, ext })` — auth required; writes to `avatars` bucket, updates `profiles.avatar_url` with signed URL (long-lived) or stores the path and resolve on read.
+- `updateProfile` — extend to accept optional `username` (validated, slugified, uniqueness checked → friendly error if taken).
+- `addFavoriteCharacter` / `removeFavoriteCharacter` / `getMyFavoriteCharacters` — auth required.
+- New `src/lib/public-profile.functions.ts` (public, no auth middleware, uses `supabaseAdmin` loaded inside handler):
+  - `getPublicProfileByUsername({ username })` → profile + favorites + recent watchlist, or null.
+
+**Jikan**
+- Extend `src/lib/jikan.functions.ts` with `getAnimeCharacters(mal_id)` (calls `https://api.jikan.moe/v4/anime/{id}/characters`).
+
+**Routing**
+- New file `src/routes/u.$username.tsx` (public, SSR on). Loader uses `ensureQueryData` on the public server fn; `head()` sets dynamic title + og:image from loader data; defines `errorComponent` + `notFoundComponent`.
 
 ### Out of scope
-- Actual episode video streaming (legal/licensing) — trailers only
-- Comments, ratings, social features
-- Admin panel
+
+Bio text, theme color, and free-text character lists were not requested. Editing username after first save is supported but uniqueness errors surface inline.
+
+```text
+profile (owner edit) ──► uploadAvatar ──► storage: avatars/{uid}/avatar.png
+                    └─► updateProfile (display_name, username)
+                    └─► favorite_characters list (remove)
+
+anime/$id (signed in) ──► heart on cast card ──► addFavoriteCharacter
+
+/u/:username (public) ──► getPublicProfileByUsername ──► render avatar,
+                                                          favorites, watchlist
+```
