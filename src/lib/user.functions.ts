@@ -115,7 +115,13 @@ export const updateProfile = createServerFn({ method: "POST" })
       if (existing) throw new Error("That username is taken 🌸");
     }
 
-    const payload: Record<string, unknown> = {
+    const payload: {
+      display_name: string;
+      updated_at: string;
+      avatar_url?: string | null;
+      bio?: string | null;
+      username?: string;
+    } = {
       display_name: data.display_name,
       updated_at: new Date().toISOString(),
     };
